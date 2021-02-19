@@ -19,17 +19,18 @@ def main():
     # paths
     parser.add_argument('--data_dir', type=str, default='images', help='path to data directory')
     parser.add_argument('--out_dir', type=str, default='output_train', help='path to output directory')
-    parser.add_argument('--model_save_path', type=str, default='trained.pt', help='path used to save the model')
+    parser.add_argument('--model_save_path', type=str, default='.', help='path used to save the model')
 
     # dataset
-    parser.add_argument('--spatial_dim', type=int, default=40, help='spatial dimension of image (dim = width = height)')
+    parser.add_argument('--spatial_dim', type=int, default=50, help='spatial dimension of image (dim = width = height)')
     parser.add_argument('--val', type=float, default=0.1, help='validation set percentage')
 
     # training parameters
-    parser.add_argument('--epochs', type=int, default=50, help='number of training epochs')
+    parser.add_argument('--epochs', type=int, default=40, help='number of training epochs')
     parser.add_argument('--batch', type=int, default=64, help='batch size')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--wd', type=float, default=0, help='weight decay')
+    parser.add_argument('--save_every', type=int, default=10, help='save model every x epochs')
 
     # general
     parser.add_argument('--seed', type=int, default=0, help='random seed')
@@ -79,6 +80,7 @@ def main():
     writer = SummaryWriter(args.out_dir)
 
     logging.info("started training.")
+    loss_min = sys.float_info.max
     for epoch in range(args.epochs):
 
         train_metrics = train(train_loader, model, criterion_class, criterion_reg, optimizer, epoch, writer)
@@ -94,10 +96,19 @@ def main():
 
         scheduler.step()
 
+        if not (epoch + 1) % args.save_every:
+            torch.save(model.state_dict(), os.path.join(args.model_save_path, 'trained_epoch_' + str(epoch+1) + '.pt'))
+
+        if val_metrics['loss'] < loss_min:
+            loss_min = val_metrics['loss']
+            torch.save(model.state_dict(), os.path.join(args.model_save_path, 'trained_best.pt'))
+
+            logging.info(f"saving new best model")
+
     writer.close()
     logging.info("finished training.")
 
-    torch.save(model.state_dict(), args.model_save_path)
+    torch.save(model.state_dict(), os.path.join(args.model_save_path, 'trained_last.pt'))
 
 
 def train(train_loader, model, criterion_class, criterion_reg, optimizer, epoch, writer):

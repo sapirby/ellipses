@@ -20,7 +20,7 @@ def main():
     # paths
     parser.add_argument('--data_dir', type=str, default='images', help='path to data directory')
     parser.add_argument('--out_dir', type=str, default='output_test', help='path to output directory')
-    parser.add_argument('--model_load_path', type=str, default='trained.pt', help='path used to load the model')
+    parser.add_argument('--model_load_path', type=str, default='trained_best.pt', help='path used to load the model')
 
     # dataset
     parser.add_argument('--spatial_dim', type=int, default=50, help='spatial dimension of image (dim = width = height)')
@@ -54,7 +54,7 @@ def main():
     np.random.seed(args.seed)
 
     test_dataset = EllipseDataset(data_dir=args.data_dir, phase="test", dim=args.spatial_dim)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch, shuffle=True, pin_memory=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch, shuffle=False, pin_memory=True)
 
     model = SmallNet()
     model.load_state_dict(torch.load(args.model_load_path))

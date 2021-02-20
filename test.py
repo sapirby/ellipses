@@ -66,7 +66,10 @@ def main():
 
     # sum of absolute errors over test dataset
     sae_loss = torch.nn.L1Loss(reduction='sum')
+    # absolute errors over test dataset, used to compute angle error
+    ae_loss = torch.nn.L1Loss(reduction='none')
     final_sae = [0 for _ in range(5)]
+    final_sae_angle = 0
 
     for step, sample in enumerate(test_loader):
         with torch.no_grad():
@@ -89,16 +92,21 @@ def main():
                                i in range(5)]
             final_sae = [final_sae[i] + final_sae_batch[i] for i in range(5)]
 
+            # angle error computation, taking angles range into account
+            final_ae_angle_batch = np.array(ae_loss(ellipses_output_org_params[:, 4], ellipses_target_org_params[:, 4]).float().numpy())
+            final_ae_angle_batch = 90 - abs(final_ae_angle_batch - 90)
+            final_sae_angle += sum(final_ae_angle_batch)
+
     # metrics
     acc = 100 * correct / total
     final_mae = [x.item() / len(test_loader.dataset) for x in final_sae]  # sum (sae) to average (mae)
-
+    final_mae_angle = final_sae_angle / len(test_loader.dataset)
     test_metrics = {'acc': acc, 'mae': final_mae}
 
     logging.info(f"test acc {test_metrics['acc']:.2f}, mean absolute errors: center_x {test_metrics['mae'][0]:.2f}, "
                  f"center_y {test_metrics['mae'][1]:.2f}, axis_1 {test_metrics['mae'][2]:.2f}, "
-                 f"axis_2 {test_metrics['mae'][3]:.2f}, angle {test_metrics['mae'][4]:.2f}, "
-                 f"angle error {test_metrics['mae'][4]*100/180:.2f}%")
+                 f"axis_2 {test_metrics['mae'][3]:.2f}, angle {final_mae_angle:.2f}, "
+                 f"angle error {final_mae_angle*100/180:.2f}%")
 
 
 if __name__ == "__main__":

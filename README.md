@@ -8,7 +8,7 @@ Install PyTorch (stable version 1.7.1), tensorboard, pandas.
 
 Either train from scratch:
 ```
-python train.py --data_dir `[your data path]`
+python train.py --data_dir [your data path]
 ```
 
 or download a [pretrained model](https://drive.google.com/file/d/1wQjoAF-XruySRxAE2DsmXX5mwDAvBc6I/view?usp=sharing)
@@ -18,7 +18,7 @@ Model files, a log file and tensorboard events file are saved locally.
 ## Test
 
 ```
-python test.py --data_dir `[your data path]` --model_load_path `[your *.pt model file path]`
+python test.py --data_dir [your data path] --model_load_path [your *.pt model file path]
 ```
 
 You should get:

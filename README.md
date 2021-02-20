@@ -21,8 +21,7 @@ Model files, a log file and tensorboard events file are saved locally.
 python test.py --data_dir [your data path] --model_load_path [your *.pt model file path]
 ```
 
-You should get:
-Accuracy: 98.60, mean absolute errors: center_x 0.86, center_y 0.85, axis_1 1.26, axis_2 0.98, angle 14.67, angle error 8.15%
+You should get: accuracy: 98.60, mean absolute errors: center_x 0.86, center_y 0.85, axis_1 1.26, axis_2 0.98, angle 14.67, angle error 8.15%
 
 
 ## Report
